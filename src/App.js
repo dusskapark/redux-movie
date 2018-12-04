@@ -11,8 +11,8 @@ class App extends Component {
     try {
       const response = await PostAction.getPost(input);
       console.log(response);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
     }
   };
 
