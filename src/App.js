@@ -6,12 +6,13 @@ import { connect } from "react-redux";
 import * as postAction from "./modules/post";
 
 
+
 class App extends Component {
   loadData = async () => {
     const { PostAction, input } = this.props;
     try {
       const response = await PostAction.getPost(input);
-      console.log(response);
+      console.log(response.data.content);
     } catch (e) {
       console.log(e);
     }

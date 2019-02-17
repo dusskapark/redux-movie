@@ -1,15 +1,5 @@
 import { createAction, handleActions } from "redux-actions";
-import axios from "axios";
-
-function getPostAPI(content) {
-  const key = `b6cf942411531af0d1635061b75f82a6`;
-  const urlString =
-    content === ""
-      ? `https://api.themoviedb.org/3/discover/movie?api_key=${key}&language=ko-Kr&page=1&include_adult=true`
-      : `https://api.themoviedb.org/3/search/movie?api_key=${key}&language=ko-Kr&page=1&include_adult=true&query=${content}`;
-
-  return axios.get(urlString);
-}
+import _callApi from "../components/_callApi";
 
 const GET_POST_PENDING = "post/GET_POST_PENDING";
 const GET_POST_SUCCESS = "post/GET_POST_SUCCESS";
@@ -19,19 +9,19 @@ const getPostPending = createAction(GET_POST_PENDING);
 const getPostSuccess = createAction(GET_POST_SUCCESS);
 const getPostFailure = createAction(GET_POST_FAILURE);
 
-export const getPost = content => dispatch => {
+export const getPost = content => async dispatch => {
   dispatch(getPostPending());
 
-  return getPostAPI(content)
-    .then(response => {
-      dispatch(getPostSuccess(response));
+  try {
+    const response = await _callApi(content);
+    dispatch(getPostSuccess(response));
+    return response;
+  }
+  catch (error) {
+    dispatch(getPostFailure(error));
+    throw error;
+  }
 
-      return response;
-    })
-    .catch(error => {
-      dispatch(getPostFailure(error));
-      throw error;
-    });
 };
 
 const initialState = {
@@ -53,7 +43,7 @@ export default handleActions(
       return {
         ...state,
         pending: false,
-        movies: action.payload.data.results
+        movies: action.data
       };
     },
     [GET_POST_FAILURE]: (state, action) => {
